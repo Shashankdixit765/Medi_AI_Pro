@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} — Created by {{ author }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Brand & Author Pill -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-brand-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+                        <i class="fa-solid fa-heart-pulse text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg sm:text-xl font-black tracking-tight text-slate-950 dark:text-white">MediAI <span class="text-sky-600 dark:text-sky-400">Pro</span></span>
+                            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">v{{ version }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                            <span>Created by</span>
+                            <span class="font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800/40">{{ author }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (Desktop) -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 tab-nav-bar">
+                    <button data-tab="symptom-tab" class="nav-tab active px-3.5 py-2 text-sm font-semibold rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-stethoscope mr-1.5"></i> Symptom Triage
+                    </button>
+                    <button data-tab="lab-tab" class="nav-tab px-3.5 py-2 text-sm font-semibold rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-flask mr-1.5"></i> Lab Analyzer
+                    </button>
+                    <button data-tab="chat-tab" class="nav-tab px-3.5 py-2 text-sm font-semibold rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-robot mr-1.5"></i> MediBot AI
+                    </button>
+                    <button data-tab="emergency-tab" class="nav-tab px-3.5 py-2 text-sm font-semibold rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-truck-medical text-rose-500 mr-1.5"></i> Emergency & SOS
+                    </button>
+                    <button data-tab="report-tab" class="nav-tab px-3.5 py-2 text-sm font-semibold rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-file-medical mr-1.5"></i> Clinical Report
+                    </button>
+                </nav>
+
+                <!-- Actions: Theme Toggle & Settings Modal -->
+                <div class="flex items-center gap-2">
+                    <button id="theme-toggle-btn" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:border-sky-500 transition shadow-sm" title="Toggle Dark/Light Mode">
+                        <i id="theme-toggle-icon" class="fa-solid fa-moon"></i>
+                    </button>
+                    <button id="open-settings-btn" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:border-sky-500 transition shadow-sm" title="AI Settings & API Key">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                    <button onclick="App.switchTab('emergency-tab')" class="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-600/20 transition">
+                        <i class="fa-solid fa-phone"></i> Emergency SOS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Sub-bar -->
+        <div class="md:hidden border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 overflow-x-auto py-2 px-4 flex gap-2 no-scrollbar">
+            <button data-tab="symptom-tab" class="nav-tab active flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-stethoscope mr-1"></i> Triage
+            </button>
+            <button data-tab="lab-tab" class="nav-tab flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-flask mr-1"></i> Labs
+            </button>
+            <button data-tab="chat-tab" class="nav-tab flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-robot mr-1"></i> MediBot
+            </button>
+            <button data-tab="emergency-tab" class="nav-tab flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 text-rose-500">
+                <i class="fa-solid fa-truck-medical mr-1"></i> SOS
+            </button>
+            <button data-tab="report-tab" class="nav-tab flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-file-medical mr-1"></i> Report
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- Hero Stats Banner -->
+        <section class="mb-8 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-sky-600 via-brand-600 to-indigo-700 text-white shadow-xl shadow-sky-600/10 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-[180px] pointer-events-none">
+                <i class="fa-solid fa-dna"></i>
+            </div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-3">
+                    <i class="fa-solid fa-microchip"></i> Next-Gen AI Clinical Decision Support
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-black tracking-tight mb-2">
+                    AI-Powered Healthcare Diagnosis Assistant
+                </h1>
+                <p class="text-sm sm:text-base text-sky-100 max-w-2xl leading-relaxed mb-6">
+                    A clinical-grade triage and diagnostic platform integrating probabilistic symptom matrix, modified NEWS2 vital signs assessment, laboratory biomarker analytics, and Gemini AI.
+                </p>
+
+                <!-- Quick Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-white/20">
+                    <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-2xl font-black">50+</div>
+                        <div class="text-[11px] text-sky-100 font-medium">Clinical Conditions & ICD-10</div>
+                    </div>
+                    <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-2xl font-black">15+</div>
+                        <div class="text-[11px] text-sky-100 font-medium">Biomarker Range Analyzers</div>
+                    </div>
+                    <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-2xl font-black">NEWS2</div>
+                        <div class="text-[11px] text-sky-100 font-medium">Vital Signs Triage Engine</div>
+                    </div>
+                    <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-2xl font-black">100%</div>
+                        <div class="text-[11px] text-sky-100 font-medium">Privacy-First Architecture</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: SYMPTOM CHECKER & TRIAGE -->
+        <!-- ========================================================================= -->
+        <section id="symptom-tab" class="tab-content-pane">
+            
+            <!-- Quick Preset Scenarios -->
+            <div class="mb-6 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Quick Test Scenarios (Instant Demo)
+                    </span>
+                    <span class="text-[11px] text-slate-400">Click any preset to auto-populate</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button type="button" data-example="cardiac" class="load-example-btn px-3 py-2 text-left rounded-xl bg-slate-50 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-slate-700/60 hover:border-rose-400 transition group">
+                        <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-rose-600">🫀 Chest Pain / Angina</div>
+                        <div class="text-[10px] text-slate-400">Arm pain, cold sweat, BP 155/96</div>
+                    </button>
+                    <button type="button" data-example="respiratory" class="load-example-btn px-3 py-2 text-left rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800/60 dark:hover:bg-sky-950/40 border border-slate-200 dark:border-slate-700/60 hover:border-sky-400 transition group">
+                        <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600">🫁 Pneumonia & Fever</div>
+                        <div class="text-[10px] text-slate-400">Cough, chills, SpO2 92%</div>
+                    </button>
+                    <button type="button" data-example="appendicitis" class="load-example-btn px-3 py-2 text-left rounded-xl bg-slate-50 hover:bg-amber-50 dark:bg-slate-800/60 dark:hover:bg-amber-950/40 border border-slate-200 dark:border-slate-700/60 hover:border-amber-400 transition group">
+                        <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-600">🩺 Appendicitis (RLQ)</div>
+                        <div class="text-[10px] text-slate-400">Navel/RLQ pain, nausea</div>
+                    </button>
+                    <button type="button" data-example="migraine" class="load-example-btn px-3 py-2 text-left rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/60 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-700/60 hover:border-indigo-400 transition group">
+                        <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600">🧠 Severe Migraine</div>
+                        <div class="text-[10px] text-slate-400">Throbbing, light sensitivity</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Two-Column Layout: Form & Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Input Form (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <form id="diagnosis-form" class="space-y-6">
+
+                        <!-- Patient Demographics Card -->
+                        <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-user-pen text-sky-600"></i> Patient Demographics & Profile
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Patient Name / Identifier</label>
+                                    <input type="text" id="patient-name-input" placeholder="e.g. John Doe" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Age (Years) *</label>
+                                    <input type="number" id="patient-age-input" min="1" max="120" placeholder="e.g. 45" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Biological Sex *</label>
+                                    <select id="patient-gender-select" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other / Non-Binary</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Comorbidities & Lifestyle -->
+                            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Medical History & Risk Factors</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-htn" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Hypertension (High BP)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-dm" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Diabetes Mellitus</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-asthma" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Asthma / COPD</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-cad" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Heart Disease (CAD)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-smoker" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Active Smoker</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs cursor-pointer">
+                                        <input type="checkbox" id="hist-pregnant" class="rounded text-sky-600 focus:ring-sky-500">
+                                        <span>Pregnant</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chief Complaint Narrative Input -->
+                        <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-comment-medical text-sky-600"></i> Chief Complaint & Narrative
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Describe in your own words what you are feeling, pain characteristics, onset, and triggers.</p>
+                            <textarea id="patient-narrative-input" rows="3" placeholder="e.g. I have been having severe squeezing pain in the middle of my chest for about an hour. It travels up my neck and down my left arm. I am also sweating and feeling breathless..." class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-sky-500 outline-none leading-relaxed"></textarea>
+                        </div>
+
+                        <!-- Symptom Selector & Body Systems -->
+                        <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fa-solid fa-clipboard-list text-sky-600"></i> Symptom Checklist
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">Select any symptoms that apply</p>
+                                </div>
+                                <span id="selected-symptoms-count" class="text-xs text-slate-400">0 selected</span>
+                            </div>
+
+                            <!-- Search bar -->
+                            <div class="relative mb-4">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="symptom-search-input" placeholder="Search symptoms (e.g. fever, headache, cough)..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                            </div>
+
+                            <!-- Body System Filter Pills -->
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <button type="button" data-system="All" class="body-system-btn active px-3 py-1 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
+                                    All Systems
+                                </button>
+                                {% for sys in body_systems %}
+                                <button type="button" data-system="{{ sys.id }}" class="body-system-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                                    <i class="fa-solid {{ sys.icon }} text-[10px] mr-1"></i> {{ sys.name }}
+                                </button>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Symptom Chips Grid -->
+                            <div class="max-h-56 overflow-y-auto p-1 border border-slate-100 dark:border-slate-800 rounded-xl">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="symptom-chips-container">
+                                    {% for key, label in symptoms.items() %}
+                                    <div class="symptom-chip p-2.5 rounded-xl text-xs font-medium flex items-center justify-between" data-symptom-id="{{ key }}">
+                                        <span>{{ label }}</span>
+                                        <i class="fa-solid fa-plus text-[10px] opacity-60"></i>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vitals & Biometrics Input Drawer -->
+                        <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fa-solid fa-heart-pulse text-rose-500"></i> Vital Signs & Biometrics
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">Essential for NEWS2 Early Warning clinical triage</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[11px] text-slate-400">Live BMI:</span>
+                                    <div id="live-bmi-display" class="text-xs text-slate-400">--</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Systolic BP (mmHg)</label>
+                                    <input type="number" id="vital-sys-bp" placeholder="120" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Diastolic BP (mmHg)</label>
+                                    <input type="number" id="vital-dia-bp" placeholder="80" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Heart Rate (bpm)</label>
+                                    <input type="number" id="vital-hr" placeholder="72" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">SpO2 (Oxygen %)</label>
+                                    <input type="number" id="vital-spo2" placeholder="98" min="50" max="100" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Body Temp (°C or °F)</label>
+                                    <input type="number" step="0.1" id="vital-temp" placeholder="37.0" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Blood Sugar (mg/dL)</label>
+                                    <input type="number" id="vital-glucose" placeholder="95" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Height (cm)</label>
+                                    <input type="number" id="vital-height" placeholder="175" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Weight (kg)</label>
+                                    <input type="number" id="vital-weight" placeholder="70" class="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-sky-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button Bar -->
+                        <div class="flex items-center gap-3">
+                            <button type="submit" id="run-diagnosis-btn" class="flex-grow py-3 px-6 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-sky-600/20 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-stethoscope"></i> Run AI Diagnostic Analysis
+                            </button>
+                            <button type="button" id="reset-symptoms-btn" class="py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-semibold transition" title="Clear form">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Diagnostic Results Panel (5 cols) -->
+                <div class="lg:col-span-5">
+                    <div class="sticky top-24">
+                        <div id="diagnosis-results-container" class="hidden space-y-6">
+                            <!-- Dynamic Results injected by symptom_checker.js -->
+                        </div>
+
+                        <!-- Placeholder when no diagnosis performed -->
+                        <div id="diagnosis-results-placeholder" class="p-8 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                            <div class="w-16 h-16 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
+                            <h4 class="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">Awaiting Clinical Input</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto leading-relaxed">
+                                Enter your symptoms, choose relevant chips, or pick a quick test scenario on the left, then click <strong>Run AI Diagnostic Analysis</strong>.
+                            </p>
+                            <div class="mt-6 flex justify-center gap-2">
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold rounded-lg text-slate-500">
+                                    <i class="fa-solid fa-shield-halved text-sky-500 mr-1"></i> Modified NEWS2
+                                </span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold rounded-lg text-slate-500">
+                                    <i class="fa-solid fa-brain text-indigo-500 mr-1"></i> Dual AI Engine
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: LAB REPORT ANALYZER -->
+        <!-- ========================================================================= -->
+        <section id="lab-tab" class="tab-content-pane hidden">
+            <div class="mb-6 p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-flask text-teal-600"></i> Clinical Laboratory Biomarker Analyzer
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Input key blood, renal, liver, lipid, or metabolic test values to evaluate against standard biological reference intervals.
+                        </p>
+                    </div>
+                    <!-- Quick Load Sample Lab Panels -->
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="load-normal-lab-preset" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold hover:bg-emerald-100 transition">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Normal Panel
+                        </button>
+                        <button type="button" id="load-diabetic-lab-preset" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-xl text-xs font-bold hover:bg-amber-100 transition">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Diabetic Panel
+                        </button>
+                        <button type="button" id="load-renal-lab-preset" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold hover:bg-rose-100 transition">
+                            <i class="fa-solid fa-radiation mr-1"></i> Renal / AKI Panel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Form -->
+            <form id="lab-analysis-form" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for key, info in lab_tests.items() %}
+                    <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex justify-between items-start mb-1">
+                            <label for="lab-{{ key }}" class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ info.name }}</label>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ info.unit }}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 mb-2">Normal Ref: {{ info.low }} - {{ info.high }} {{ info.unit }}</div>
+                        <input type="number" step="any" id="lab-{{ key }}" placeholder="Enter value..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:ring-2 focus:ring-teal-500 outline-none">
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button type="submit" id="run-lab-analysis-btn" class="flex-grow py-3 px-6 rounded-xl bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 text-white font-bold text-sm shadow-lg shadow-teal-600/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-microscope"></i> Analyze Biomarkers & Reference Ranges
+                    </button>
+                    <button type="button" id="clear-lab-form-btn" class="py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-semibold transition" title="Clear values">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Lab Results Display -->
+            <div id="lab-results-container" class="mt-8 hidden">
+                <!-- Dynamically populated by lab_analyzer.js -->
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: MEDIBOT AI CHAT -->
+        <!-- ========================================================================= -->
+        <section id="chat-tab" class="tab-content-pane hidden">
+            <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md flex flex-col h-[650px] overflow-hidden">
+                
+                <!-- Chat Header -->
+                <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">MediBot AI Assistant</h3>
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Clinical Conversational Agent — Created by {{ author }}</p>
+                        </div>
+                    </div>
+                    <button id="clear-chat-btn" class="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition" title="Reset conversation">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Suggested Quick Prompts -->
+                <div class="p-3 bg-slate-100/50 dark:bg-slate-800/30 border-b border-slate-200/60 dark:border-slate-800/60 overflow-x-auto flex gap-2 no-scrollbar">
+                    <button data-prompt="What does a high blood pressure reading of 150/95 mmHg mean?" class="chat-prompt-pill flex-shrink-0 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs hover:border-sky-500 transition">
+                        💓 High BP Explanation
+                    </button>
+                    <button data-prompt="What are the immediate warning signs of a heart attack?" class="chat-prompt-pill flex-shrink-0 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs hover:border-sky-500 transition">
+                        ⚠️ Heart Attack Red Flags
+                    </button>
+                    <button data-prompt="How is HbA1c used to diagnose diabetes, and what is the normal range?" class="chat-prompt-pill flex-shrink-0 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs hover:border-sky-500 transition">
+                        🩸 HbA1c & Diabetes
+                    </button>
+                    <button data-prompt="What are effective home care tips and medications for migraine headache?" class="chat-prompt-pill flex-shrink-0 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs hover:border-sky-500 transition">
+                        🧠 Migraine Care
+                    </button>
+                    <button data-prompt="Who created and architected the MediAI Healthcare Diagnosis Assistant?" class="chat-prompt-pill flex-shrink-0 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs hover:border-sky-500 transition font-medium text-sky-600 dark:text-sky-400">
+                        👨‍💻 Who created MediAI?
+                    </button>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="chat-messages-container" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-4">
+                    <!-- Default Bot Greeting -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div class="chat-bubble-bot p-4 shadow-sm max-w-[85%] text-sm leading-relaxed">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-sky-600 dark:text-sky-400 text-xs">MediBot AI Assistant</span>
+                                <span class="text-[10px] text-slate-400">System Ready</span>
+                            </div>
+                            <p class="mb-2">Hello! I am your AI Medical & Diagnostic Assistant, created by <strong>Shashank Dixit</strong>.</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                You can ask me about symptoms, medical terminology, lab tests (like HbA1c, CBC, Creatinine), blood pressure interpretation, or first-aid protocols. How may I help you today?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Form -->
+                <form id="chat-form" class="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Type your health or medical question..." autocomplete="off" class="flex-grow px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                    <button type="submit" class="p-2.5 sm:px-5 sm:py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-bold shadow-md shadow-sky-600/20 transition flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> <span class="hidden sm:inline">Send</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: EMERGENCY & FIRST AID GUIDELINES -->
+        <!-- ========================================================================= -->
+        <section id="emergency-tab" class="tab-content-pane hidden">
+            
+            <!-- Red Emergency Banner -->
+            <div class="mb-8 p-6 bg-gradient-to-r from-rose-600 to-red-700 text-white rounded-3xl shadow-xl shadow-rose-600/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl">
+                        <i class="fa-solid fa-truck-medical animate-bounce"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black">Emergency Medical Services & First Aid</h2>
+                        <p class="text-xs sm:text-sm text-rose-100 mt-1">If the patient is unconscious, unresponsive, or experiencing severe trauma, call local emergency hotlines immediately.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="tel:112" class="px-5 py-2.5 bg-white text-rose-700 hover:bg-rose-50 rounded-xl text-sm font-black shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-phone"></i> Call 112 (Universal)
+                    </a>
+                    <a href="tel:108" class="px-5 py-2.5 bg-rose-950 text-white hover:bg-black rounded-xl text-sm font-black shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-ambulance"></i> Call 108 (Ambulance)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Emergency Hotline Directory -->
+            <div class="mb-8">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-phone-volume text-rose-600"></i> Emergency Helpline Directory
+                </h3>
+                <div id="hotlines-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Populated dynamically by app.js -->
+                </div>
+            </div>
+
+            <!-- Standard First-Aid Protocol Cards -->
+            <h3 class="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-kit-medical text-sky-600"></i> Evidence-Based First Aid Protocols
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Adult CPR -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-rose-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-heart-crack"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Adult CPR (Cardiac Arrest)</h4>
+                            <span class="text-[10px] text-slate-400">Hands-Only CPR Protocol</span>
+                        </div>
+                    </div>
+                    <ol class="list-decimal list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li>Check responsiveness and breathing. Call emergency dispatch immediately.</li>
+                        <li>Place heel of one hand in center of patient's chest; place other hand on top and interlock fingers.</li>
+                        <li>Push hard and fast: 100 to 120 compressions per minute at 2 inches (5 cm) depth.</li>
+                        <li>Allow chest to recoil fully between compressions. Continue until AED or ambulance arrives.</li>
+                    </ol>
+                </div>
+
+                <!-- Stroke FAST -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-amber-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-brain"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Stroke F.A.S.T. Assessment</h4>
+                            <span class="text-[10px] text-slate-400">Immediate Neurological Protocol</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li><strong>F - Face:</strong> Ask patient to smile. Look for one-sided facial drooping.</li>
+                        <li><strong>A - Arms:</strong> Ask them to raise both arms. Does one arm drift downward?</li>
+                        <li><strong>S - Speech:</strong> Ask them to repeat a simple sentence. Is speech slurred?</li>
+                        <li><strong>T - Time:</strong> Call emergency services immediately. Note exact symptom onset time!</li>
+                    </ul>
+                </div>
+
+                <!-- Choking Heimlich -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-sky-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-head-side-cough"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Choking (Heimlich Maneuver)</h4>
+                            <span class="text-[10px] text-slate-400">Airway Obstruction Protocol</span>
+                        </div>
+                    </div>
+                    <ol class="list-decimal list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li>Stand behind victim, wrap arms around their waist.</li>
+                        <li>Make a fist with one hand; place thumb side against abdomen just above navel.</li>
+                        <li>Grasp fist with other hand and press inward and upward with quick thrusts.</li>
+                        <li>Repeat until the foreign object is expelled or patient becomes unconscious (begin CPR).</li>
+                    </ol>
+                </div>
+
+                <!-- Heart Attack Immediate -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-rose-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Heart Attack Protocol</h4>
+                            <span class="text-[10px] text-slate-400">Suspected Myocardial Infarction</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li>Have patient immediately stop all physical exertion and sit in a comfortable resting position.</li>
+                        <li>Dial emergency medical dispatch without delay.</li>
+                        <li>Administer 300mg chewed Aspirin unless history of active bleeding or allergy.</li>
+                        <li>Loosen tight collars or clothing around chest and neck. Keep patient calm.</li>
+                    </ul>
+                </div>
+
+                <!-- Anaphylaxis Protocol -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-purple-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-shield-virus"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Severe Allergic Anaphylaxis</h4>
+                            <span class="text-[10px] text-slate-400">Acute Airway Hypersensitivity</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li>Look for swollen lips/tongue, wheezing, hives, or sudden dizziness.</li>
+                        <li>Immediately inject Epinephrine auto-injector (EpiPen) into outer mid-thigh.</li>
+                        <li>Lay patient flat with legs elevated (unless breathing is difficult, then sit up).</li>
+                        <li>Call emergency hotline immediately; second dose may be needed after 5-15 mins.</li>
+                    </ul>
+                </div>
+
+                <!-- Severe Bleeding Protocol -->
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-red-400 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="p-2.5 bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 rounded-xl text-lg font-bold">
+                            <i class="fa-solid fa-droplet"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">Severe Hemorrhage / Bleeding</h4>
+                            <span class="text-[10px] text-slate-400">External Wound Hemostasis</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+                        <li>Apply firm, continuous direct pressure over the wound using sterile gauze or clean cloth.</li>
+                        <li>Maintain constant pressure for at least 10 minutes without lifting gauze to check.</li>
+                        <li>Apply pressure bandage. If arterial spurting limb bleeding persists, apply commercial tourniquet 2-3 inches above wound.</li>
+                        <li>Keep patient warm to prevent hypothermia and shock.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: CLINICAL CONSULTATION REPORT -->
+        <!-- ========================================================================= -->
+        <section id="report-tab" class="tab-content-pane hidden">
+            <div id="report-printable-area">
+                <!-- Dynamically rendered by App.renderConsultationReport() -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-sky-100 dark:bg-sky-950 text-sky-600 rounded-xl text-sm">
+                        <i class="fa-solid fa-sliders"></i>
+                    </span>
+                    <h3 class="font-bold text-slate-900 dark:text-white text-base">MediAI Pro Settings</h3>
+                </div>
+                <button id="close-settings-btn" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Google Gemini API Key (Optional)
+                    </label>
+                    <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono focus:ring-2 focus:ring-sky-500 outline-none">
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Enables advanced conversational reasoning and generative insights. If omitted, the assistant operates seamlessly on its built-in clinical rule & triage engine.
+                    </p>
+                </div>
+
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
+                    <div class="font-bold text-slate-900 dark:text-white mb-1">About MediAI Pro:</div>
+                    <div>Architected & Created by: <strong>{{ author }}</strong></div>
+                    <div>Version: <strong>{{ version }}</strong></div>
+                    <div>Platform: <strong>FastAPI + Dual Clinical AI Engine</strong></div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="save-settings-btn" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition">
+                        Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="max-w-3xl mx-auto leading-relaxed">
+                <strong>Clinical Disclaimer:</strong> MediAI Pro is an AI-powered clinical decision support system designed for educational, informational, and triage guidance purposes only. It is not an automated medical provider. In medical emergencies, immediately contact local emergency services.
+            </p>
+            <div class="flex items-center justify-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 pt-2">
+                <span>Designed & Engineered with ❤️ by</span>
+                <span class="text-sky-600 dark:text-sky-400 font-bold">{{ author }}</span>
+                <span>• All Rights Reserved</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/symptom_checker.js"></script>
+    <script src="/static/js/lab_analyzer.js"></script>
+    <script src="/static/js/chatbot.js"></script>
+</body>
+</html>
